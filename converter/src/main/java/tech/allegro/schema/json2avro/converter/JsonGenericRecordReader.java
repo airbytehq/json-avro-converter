@@ -94,7 +94,6 @@ public class JsonGenericRecordReader {
         GenericRecordBuilder record = new GenericRecordBuilder(schema);
         json.entrySet().forEach(entry -> {
             Field field = schema.getField(entry.getKey());
-            System.out.println("Field: " + field);
             if (field != null) {
                 record.set(field, read(field, field.schema(), entry.getValue(), path, false));
             } else if (unknownFieldListener != null) {

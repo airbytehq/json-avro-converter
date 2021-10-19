@@ -1,8 +1,10 @@
 package tech.allegro.schema.json2avro.converter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
@@ -19,9 +21,40 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.avro.specific.SpecificRecordBase;
+import tech.allegro.schema.json2avro.converter.JsonGenericRecordReader.Builder;
 
 public class JsonAvroConverter {
     private final JsonGenericRecordReader recordReader;
+
+    public static class Builder {
+        private final JsonGenericRecordReader.Builder recordReaderBuilder = JsonGenericRecordReader.builder();
+
+        private Builder() {
+        }
+
+        public Builder setObjectMapper(ObjectMapper mapper) {
+            recordReaderBuilder.setObjectMapper(mapper);
+            return this;
+        }
+
+        public Builder setUnknownFieldListener(UnknownFieldListener unknownFieldListener) {
+            recordReaderBuilder.setUnknownFieldListener(unknownFieldListener);
+            return this;
+        }
+
+        public Builder setStandardizedFieldNames(Map<String, String> standardizedFieldNames) {
+            recordReaderBuilder.setStandardizedFieldNames(standardizedFieldNames);
+            return this;
+        }
+
+        public JsonAvroConverter build() {
+            return new JsonAvroConverter(recordReaderBuilder.build());
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public JsonAvroConverter() {
         this.recordReader = JsonGenericRecordReader.builder().build();

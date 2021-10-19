@@ -1,0 +1,68 @@
+[
+  {
+    "testCase": "simple_schema",
+    "avroSchema": {
+      "type": "record",
+      "name": "simple_schema",
+      "fields": [
+        {
+          "name": "username",
+          "type": [
+            "null",
+            "string"
+          ],
+          "default": null
+        }
+      ]
+    },
+    "jsonObject": {
+      "username": "Thomas"
+    },
+    "avroObject": {
+      "username": "Thomas"
+    }
+  },
+  {
+    "testCase": "with_additional_properties",
+    "avroSchema": {
+      "type": "record",
+      "name": "simple_schema",
+      "fields": [
+        {
+          "name": "username",
+          "type": [
+            "null",
+            "string"
+          ],
+          "default": null
+        },
+        {
+          "name": "_ab_additional_properties",
+          "type": [
+            "null",
+            {
+              "type": "map",
+              "values": "string"
+            }
+          ],
+          "default": null
+        }
+      ]
+    },
+    "jsonObject": {
+      "username": "Thomas",
+      "domain": "airbyte.io",
+      "auth": {
+        "type": "ssl",
+        "api_key": "abcdefg/012345"
+      }
+    },
+    "avroObject": {
+      "username": "Thomas",
+      "_ab_additional_properties": {
+        "domain": "airbyte.io",
+        "auth": "{\"type\":\"ssl\",\"api_key\":\"abcdefg/012345\"}"
+      }
+    }
+  }
+]
