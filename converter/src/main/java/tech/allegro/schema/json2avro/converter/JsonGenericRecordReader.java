@@ -2,6 +2,7 @@ package tech.allegro.schema.json2avro.converter;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import org.apache.avro.AvroRuntimeException;
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
@@ -28,19 +29,45 @@ public class JsonGenericRecordReader {
     private static final Object INCOMPATIBLE = new Object();
     private final ObjectMapper mapper;
     private final UnknownFieldListener unknownFieldListener;
+    // a mapping from original to standardized field names
+    private final Map<String, String> standardizedFieldNames;
 
+    public static final class Builder {
+        private ObjectMapper mapper = new ObjectMapper();
+        private UnknownFieldListener unknownFieldListener;
+        private Map<String, String> standardizedFieldNames = Collections.emptyMap();
 
-    public JsonGenericRecordReader() {
-        this(new ObjectMapper());
+        private Builder() {
+        }
+
+        public Builder setObjectMapper(ObjectMapper mapper) {
+            this.mapper = mapper;
+            return this;
+        }
+
+        public Builder setUnknownFieldListener(UnknownFieldListener unknownFieldListener) {
+            this.unknownFieldListener = unknownFieldListener;
+            return this;
+        }
+
+        public Builder setStandardizedFieldNames(Map<String, String> standardizedFieldNames) {
+            this.standardizedFieldNames = standardizedFieldNames;
+            return this;
+        }
+
+        public JsonGenericRecordReader build() {
+            return new JsonGenericRecordReader(mapper, unknownFieldListener, standardizedFieldNames);
+        }
     }
 
-    public JsonGenericRecordReader(ObjectMapper mapper) {
-        this(mapper, null);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public JsonGenericRecordReader(ObjectMapper mapper, UnknownFieldListener unknownFieldListener) {
+    public JsonGenericRecordReader(ObjectMapper mapper, UnknownFieldListener unknownFieldListener, Map<String, String> standardizedFieldNames) {
         this.mapper = mapper;
         this.unknownFieldListener = unknownFieldListener;
+        this.standardizedFieldNames = standardizedFieldNames;
     }
 
     @SuppressWarnings("unchecked")
@@ -67,6 +94,7 @@ public class JsonGenericRecordReader {
         GenericRecordBuilder record = new GenericRecordBuilder(schema);
         json.entrySet().forEach(entry -> {
             Field field = schema.getField(entry.getKey());
+            System.out.println("Field: " + field);
             if (field != null) {
                 record.set(field, read(field, field.schema(), entry.getValue(), path, false));
             } else if (unknownFieldListener != null) {
