@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.util.function.Function;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
@@ -21,7 +21,6 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.avro.specific.SpecificRecordBase;
-import tech.allegro.schema.json2avro.converter.JsonGenericRecordReader.Builder;
 
 public class JsonAvroConverter {
     private final JsonGenericRecordReader recordReader;
@@ -42,8 +41,8 @@ public class JsonAvroConverter {
             return this;
         }
 
-        public Builder setStandardizedFieldNames(Map<String, String> standardizedFieldNames) {
-            recordReaderBuilder.setStandardizedFieldNames(standardizedFieldNames);
+        public Builder setStandardizedFieldNames(Function<String, String> nameTransformer) {
+            recordReaderBuilder.setStandardizedFieldNames(nameTransformer);
             return this;
         }
 

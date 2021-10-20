@@ -27,22 +27,6 @@ public class JsonAvroConverterTest {
   private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final ObjectWriter WRITER = MAPPER.writer();
 
-  public static <T> String serialize(final T object) {
-    try {
-      return MAPPER.writeValueAsString(object);
-    } catch (final JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static JsonNode deserialize(final String jsonString) {
-    try {
-      return MAPPER.readTree(jsonString);
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   @SuppressWarnings("UnstableApiUsage")
   public static String readResource(final String name) throws IOException {
     final URL resource = Resources.getResource(name);
@@ -60,15 +44,12 @@ public class JsonAvroConverterTest {
   public static class JsonToAvroConverterTestCaseProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(final ExtensionContext context) throws Exception {
-      final JsonNode testCases = deserialize(readResource("json_avro_converter.json"));
-      return toList(testCases.elements()).stream().map(testCase -> {
-        System.out.println(testCase);
-        return Arguments.of(
-            testCase.get("testCase").asText(),
-            testCase.get("avroSchema"),
-            testCase.get("jsonObject"),
-            testCase.get("avroObject"));
-      });
+      final JsonNode testCases = JsonHelper.deserialize(readResource("json_avro_converter.json"));
+      return toList(testCases.elements()).stream().map(testCase -> Arguments.of(
+          testCase.get("testCase").asText(),
+          testCase.get("avroSchema"),
+          testCase.get("jsonObject"),
+          testCase.get("avroObject")));
     }
   }
 
@@ -77,9 +58,9 @@ public class JsonAvroConverterTest {
   public void testJsonToAvroConverter(String testCaseName, JsonNode avroSchema, JsonNode jsonObject, JsonNode avroObject)
       throws JsonProcessingException {
     JsonAvroConverter converter = JsonAvroConverter.builder().build();
-    Schema schema =  new Schema.Parser().parse(serialize(avroSchema));
+    Schema schema =  new Schema.Parser().parse(JsonHelper.serialize(avroSchema));
     GenericData.Record actualAvroObject = converter.convertToGenericDataRecord(WRITER.writeValueAsBytes(jsonObject), schema);
-    assertEquals(avroObject, deserialize(actualAvroObject.toString()), String.format("Test for %s failed", testCaseName));
+    assertEquals(avroObject, JsonHelper.deserialize(actualAvroObject.toString()), String.format("Test for %s failed", testCaseName));
   }
 
 }
