@@ -16,22 +16,25 @@ public class AdditionalPropertyField {
       Schema.createMap(Schema.create(Type.STRING)));
   public static final Field FIELD = new Field(FIELD_NAME, FIELD_SCHEMA, null, null);
 
-  public static Map<String, String> getMapValue(Map<String, Object> genericValue) {
-    return genericValue.entrySet().stream().collect(Collectors.toMap(
+  @SuppressWarnings("unchecked")
+  public static Map<String, String> getMapValue(Object genericValue) {
+    Map<String, Object> mapValue = (Map<String, Object>) genericValue;
+    return mapValue.entrySet().stream().collect(Collectors.toMap(
         Entry::getKey,
         r -> {
           JsonNode jsonNode = JsonHelper.jsonNode(r.getValue());
-          if (jsonNode.isTextual()) {
-            return jsonNode.asText();
-          } else {
-            return JsonHelper.serialize(jsonNode);
-          }
+          return serialize(jsonNode);
         }));
   }
 
   public static String getValue(Object genericValue) {
     JsonNode jsonNode = JsonHelper.jsonNode(genericValue);
+    return serialize(jsonNode);
+  }
+
+  public static String serialize(JsonNode jsonNode) {
     if (jsonNode.isTextual()) {
+      // serialize a textual field this way to avoid additional quotation marks
       return jsonNode.asText();
     } else {
       return JsonHelper.serialize(jsonNode);

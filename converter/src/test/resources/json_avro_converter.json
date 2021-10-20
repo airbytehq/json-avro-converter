@@ -12,14 +12,34 @@
             "string"
           ],
           "default": null
+        },
+        {
+          "name": "active",
+          "type": [
+            "null",
+            "boolean"
+          ],
+          "default": null
+        },
+        {
+          "name": "age",
+          "type": [
+            "null",
+            "int"
+          ],
+          "default": null
         }
       ]
     },
     "jsonObject": {
-      "username": "Thomas"
+      "username": "Thomas",
+      "active": true,
+      "age": 21
     },
     "avroObject": {
-      "username": "Thomas"
+      "username": "Thomas",
+      "active": true,
+      "age": 21
     }
   },
   {
@@ -35,11 +55,29 @@
             "string"
           ],
           "default": null
+        },
+        {
+          "name": "active",
+          "type": [
+            "null",
+            "boolean"
+          ],
+          "default": null
+        },
+        {
+          "name": "age",
+          "type": [
+            "null",
+            "int"
+          ],
+          "default": null
         }
       ]
     },
     "jsonObject": {
       "username": "Thomas",
+      "active": true,
+      "age": 21,
       "domain": "airbyte.io",
       "auth": {
         "type": "ssl",
@@ -49,7 +87,9 @@
       }
     },
     "avroObject": {
-      "username": "Thomas"
+      "username": "Thomas",
+      "active": true,
+      "age": 21
     }
   },
   {
@@ -63,6 +103,22 @@
           "type": [
             "null",
             "string"
+          ],
+          "default": null
+        },
+        {
+          "name": "active",
+          "type": [
+            "null",
+            "boolean"
+          ],
+          "default": null
+        },
+        {
+          "name": "age",
+          "type": [
+            "null",
+            "int"
           ],
           "default": null
         },
@@ -81,6 +137,8 @@
     },
     "jsonObject": {
       "username": "Thomas",
+      "active": true,
+      "age": 21,
       "domain": "airbyte.io",
       "auth": {
         "type": "ssl",
@@ -91,6 +149,8 @@
     },
     "avroObject": {
       "username": "Thomas",
+      "active": true,
+      "age": 21,
       "_ab_additional_properties": {
         "domain": "airbyte.io",
         "auth": "{\"type\":\"ssl\",\"api_key\":\"abcdefg/012345\",\"admin\":false,\"id\":1000}"
@@ -110,11 +170,29 @@
             "string"
           ],
           "default": null
+        },
+        {
+          "name": "active",
+          "type": [
+            "null",
+            "boolean"
+          ],
+          "default": null
+        },
+        {
+          "name": "age",
+          "type": [
+            "null",
+            "int"
+          ],
+          "default": null
         }
       ]
     },
     "jsonObject": {
       "username": "Thomas",
+      "active": true,
+      "age": 21,
       "_ab_additional_properties": {
         "domain": "airbyte.io",
         "auth": {
@@ -126,7 +204,9 @@
       }
     },
     "avroObject": {
-      "username": "Thomas"
+      "username": "Thomas",
+      "active": true,
+      "age": 21
     }
   },
   {
@@ -140,6 +220,22 @@
           "type": [
             "null",
             "string"
+          ],
+          "default": null
+        },
+        {
+          "name": "active",
+          "type": [
+            "null",
+            "boolean"
+          ],
+          "default": null
+        },
+        {
+          "name": "age",
+          "type": [
+            "null",
+            "int"
           ],
           "default": null
         },
@@ -158,6 +254,8 @@
     },
     "jsonObject": {
       "username": "Thomas",
+      "active": true,
+      "age": 21,
       "_ab_additional_properties": {
         "domain": "airbyte.io",
         "auth": {
@@ -170,6 +268,8 @@
     },
     "avroObject": {
       "username": "Thomas",
+      "active": true,
+      "age": 21,
       "_ab_additional_properties": {
         "domain": "airbyte.io",
         "auth": "{\"type\":\"ssl\",\"api_key\":\"abcdefg/012345\",\"admin\":false,\"id\":1000}"

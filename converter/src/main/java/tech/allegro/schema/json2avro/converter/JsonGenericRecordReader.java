@@ -26,7 +26,6 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecordBuilder;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class JsonGenericRecordReader {
     private static final Object INCOMPATIBLE = new Object();
     private final ObjectMapper mapper;
@@ -96,24 +95,24 @@ public class JsonGenericRecordReader {
     private GenericData.Record readRecord(Map<String, Object> json, Schema schema, Deque<String> path) {
         GenericRecordBuilder record = new GenericRecordBuilder(schema);
         Map<String, String> additionalProperties = new HashMap<>();
-        boolean hasAdditionalPropertySchema = schema.getField(AdditionalPropertyField.FIELD_NAME) != null;
+        boolean allowAdditionalProperties = schema.getField(AdditionalPropertyField.FIELD_NAME) != null;
         json.entrySet().forEach(entry -> {
             Field field = schema.getField(entry.getKey());
             if (field != null) {
                 if (field.name().equals(AdditionalPropertyField.FIELD_NAME)) {
-                    additionalProperties.putAll(AdditionalPropertyField.getMapValue((Map<String, Object>) entry.getValue()));
+                    additionalProperties.putAll(AdditionalPropertyField.getMapValue(entry.getValue()));
                 } else {
                     record.set(nameTransformer.apply(field.name()),
                         read(field, field.schema(), entry.getValue(), path, false));
                 }
-            } else if (hasAdditionalPropertySchema) {
+            } else if (allowAdditionalProperties) {
                 String fieldName = nameTransformer.apply(entry.getKey());
                 additionalProperties.put(fieldName, AdditionalPropertyField.getValue(entry.getValue()));
             } else if (unknownFieldListener != null) {
                 unknownFieldListener.onUnknownField(entry.getKey(), entry.getValue(), PathsPrinter.print(path, entry.getKey()));
             }
         });
-        if (hasAdditionalPropertySchema && additionalProperties.size() > 0) {
+        if (allowAdditionalProperties && additionalProperties.size() > 0) {
             record.set(AdditionalPropertyField.FIELD_NAME,
                 read(AdditionalPropertyField.FIELD, AdditionalPropertyField.FIELD_SCHEMA, additionalProperties, path, false));
         }
