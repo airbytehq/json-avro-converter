@@ -41,8 +41,8 @@ public class JsonAvroConverter {
             return this;
         }
 
-        public Builder setStandardizedFieldNames(Function<String, String> nameTransformer) {
-            recordReaderBuilder.setStandardizedFieldNames(nameTransformer);
+        public Builder setNameTransformer(Function<String, String> nameTransformer) {
+            recordReaderBuilder.setNameTransformer(nameTransformer);
             return this;
         }
 

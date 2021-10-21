@@ -80,7 +80,7 @@
       "age": 21,
       "domain": "airbyte.io",
       "auth": {
-        "type": "ssl",
+        "auth_type": "ssl",
         "api_key": "abcdefg/012345",
         "admin": false,
         "id": 1000
@@ -141,7 +141,7 @@
       "age": 21,
       "domain": "airbyte.io",
       "auth": {
-        "type": "ssl",
+        "auth_type": "ssl",
         "api_key": "abcdefg/012345",
         "admin": false,
         "id": 1000
@@ -153,7 +153,7 @@
       "age": 21,
       "_ab_additional_properties": {
         "domain": "airbyte.io",
-        "auth": "{\"type\":\"ssl\",\"api_key\":\"abcdefg/012345\",\"admin\":false,\"id\":1000}"
+        "auth": "{\"auth_type\":\"ssl\",\"api_key\":\"abcdefg/012345\",\"admin\":false,\"id\":1000}"
       }
     }
   },
@@ -196,7 +196,7 @@
       "_ab_additional_properties": {
         "domain": "airbyte.io",
         "auth": {
-          "type": "ssl",
+          "auth_type": "ssl",
           "api_key": "abcdefg/012345",
           "admin": false,
           "id": 1000
@@ -259,7 +259,7 @@
       "_ab_additional_properties": {
         "domain": "airbyte.io",
         "auth": {
-          "type": "ssl",
+          "auth_type": "ssl",
           "api_key": "abcdefg/012345",
           "admin": false,
           "id": 1000
@@ -272,8 +272,99 @@
       "age": 21,
       "_ab_additional_properties": {
         "domain": "airbyte.io",
-        "auth": "{\"type\":\"ssl\",\"api_key\":\"abcdefg/012345\",\"admin\":false,\"id\":1000}"
+        "auth": "{\"auth_type\":\"ssl\",\"api_key\":\"abcdefg/012345\",\"admin\":false,\"id\":1000}"
       }
+    }
+  },
+  {
+    "testCase": "transform_name",
+    "avroSchema": {
+      "type": "record",
+      "name": "simple_schema",
+      "fields": [
+        {
+          "name": "USERNAME",
+          "type": [
+            "null",
+            "string"
+          ],
+          "default": null
+        },
+        {
+          "name": "AUTH",
+          "type": [
+            "null",
+            {
+              "type": "record",
+              "name": "AUTH",
+              "fields": [
+                {
+                  "name": "AUTH_TYPE",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "API_KEY",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "ADMIN",
+                  "type": [
+                    "null",
+                    "boolean"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "ID",
+                  "type": [
+                    "null",
+                    "int"
+                  ],
+                  "default": null
+                }
+              ]
+            }
+          ],
+          "default": null
+        },
+        {
+          "name": "AGE",
+          "type": [
+            "null",
+            "int"
+          ],
+          "default": null
+        }
+      ]
+    },
+    "name_transformer": true,
+    "jsonObject": {
+      "username": "Thomas",
+      "auth": {
+        "auth_type": "ssl",
+        "api_key": "abcdefg/012345",
+        "admin": false,
+        "id": 1000
+      },
+      "age": 21
+    },
+    "avroObject": {
+      "USERNAME": "Thomas",
+      "AUTH": {
+        "AUTH_TYPE": "ssl",
+        "API_KEY": "abcdefg/012345",
+        "ADMIN": false,
+        "ID": 1000
+      },
+      "AGE": 21
     }
   }
 ]

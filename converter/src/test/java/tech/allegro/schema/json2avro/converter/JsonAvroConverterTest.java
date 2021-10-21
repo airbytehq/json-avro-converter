@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -49,17 +50,20 @@ public class JsonAvroConverterTest {
           testCase.get("testCase").asText(),
           testCase.get("avroSchema"),
           testCase.get("jsonObject"),
-          testCase.get("avroObject")));
+          testCase.get("avroObject"),
+          testCase.has("name_transformer") && testCase.get("name_transformer").asBoolean()));
     }
   }
 
   @ParameterizedTest
   @ArgumentsSource(JsonToAvroConverterTestCaseProvider.class)
-  public void testJsonToAvroConverter(String testCaseName, JsonNode avroSchema, JsonNode jsonObject, JsonNode avroObject)
+  public void testJsonToAvroConverter(String testCaseName, JsonNode avroSchema, JsonNode jsonObject, JsonNode avroObject, boolean useNameTransformer)
       throws JsonProcessingException {
-    JsonAvroConverter converter = JsonAvroConverter.builder().build();
-    Schema schema =  new Schema.Parser().parse(JsonHelper.serialize(avroSchema));
-    GenericData.Record actualAvroObject = converter.convertToGenericDataRecord(WRITER.writeValueAsBytes(jsonObject), schema);
+    final JsonAvroConverter converter = JsonAvroConverter.builder()
+        .setNameTransformer(useNameTransformer ? String::toUpperCase : Function.identity())
+        .build();
+    final Schema schema =  new Schema.Parser().parse(JsonHelper.serialize(avroSchema));
+    final GenericData.Record actualAvroObject = converter.convertToGenericDataRecord(WRITER.writeValueAsBytes(jsonObject), schema);
     assertEquals(avroObject, JsonHelper.deserialize(actualAvroObject.toString()), String.format("Test for %s failed", testCaseName));
   }
 

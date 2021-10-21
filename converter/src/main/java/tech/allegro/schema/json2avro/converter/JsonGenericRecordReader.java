@@ -50,7 +50,7 @@ public class JsonGenericRecordReader {
             return this;
         }
 
-        public Builder setStandardizedFieldNames(Function<String, String> nameTransformer) {
+        public Builder setNameTransformer(Function<String, String> nameTransformer) {
             this.nameTransformer = nameTransformer;
             return this;
         }
@@ -97,16 +97,15 @@ public class JsonGenericRecordReader {
         Map<String, String> additionalProperties = new HashMap<>();
         boolean allowAdditionalProperties = schema.getField(AdditionalPropertyField.FIELD_NAME) != null;
         json.entrySet().forEach(entry -> {
-            Field field = schema.getField(entry.getKey());
+            String fieldName = nameTransformer.apply(entry.getKey());
+            Field field = schema.getField(fieldName);
             if (field != null) {
-                if (field.name().equals(AdditionalPropertyField.FIELD_NAME)) {
+                if (fieldName.equals(AdditionalPropertyField.FIELD_NAME)) {
                     additionalProperties.putAll(AdditionalPropertyField.getMapValue(entry.getValue()));
                 } else {
-                    record.set(nameTransformer.apply(field.name()),
-                        read(field, field.schema(), entry.getValue(), path, false));
+                    record.set(fieldName, read(field, field.schema(), entry.getValue(), path, false));
                 }
             } else if (allowAdditionalProperties) {
-                String fieldName = nameTransformer.apply(entry.getKey());
                 additionalProperties.put(fieldName, AdditionalPropertyField.getValue(entry.getValue()));
             } else if (unknownFieldListener != null) {
                 unknownFieldListener.onUnknownField(entry.getKey(), entry.getValue(), PathsPrinter.print(path, entry.getKey()));
@@ -121,9 +120,10 @@ public class JsonGenericRecordReader {
 
     @SuppressWarnings("unchecked")
     private Object read(Schema.Field field, Schema schema, Object value, Deque<String> path, boolean silently) {
-        boolean pushed = !field.name().equals(path.peekLast());
+        String fieldName = nameTransformer.apply(field.name());
+        boolean pushed = !fieldName.equals(path.peekLast());
         if (pushed) {
-            path.addLast(field.name());
+            path.addLast(fieldName);
         }
         Object result;
 
