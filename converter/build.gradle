@@ -44,10 +44,10 @@ jmh {
 }
 
 dependencies {
-    compile group: 'org.apache.avro', name: 'avro', version: '1.9.0'
+    implementation group: 'org.apache.avro', name: 'avro', version: '1.9.0'
 
-    testCompile group: 'org.spockframework', name: 'spock-core', version: versions.spock
-    testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: versions.groovy
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: versions.spock
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-all', version: versions.groovy
 
     jmh 'org.openjdk.jmh:jmh-core:1.20'
     jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.20'
