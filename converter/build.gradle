@@ -17,7 +17,8 @@ plugins {
     id 'maven-publish'
     // does not work with Java 10
     // id 'jacoco'
-    id 'me.champeau.gradle.jmh' version '0.4.5'
+    // https://github.com/melix/jmh-gradle-plugin#what-plugin-version-to-use
+    id 'me.champeau.gradle.jmh' version '0.5.3'
 }
 
 apply plugin: 'com.commercehub.gradle.plugin.avro'
