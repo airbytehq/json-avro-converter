@@ -16,6 +16,7 @@ shadowJar {
 dependencies {
     implementation project(':converter')
 
+    implementation group: 'org.apache.avro', name: 'avro', version: '1.9.0'
     implementation group: 'com.beust', name: 'jcommander', version: '1.72'
     implementation group: 'com.google.guava', name: 'guava', version: '24.0-jre'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.10'
