@@ -14,19 +14,16 @@ import tech.allegro.schema.json2avro.converter.util.DateTimeUtils;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static tech.allegro.schema.json2avro.converter.AdditionalPropertyField.DEFAULT_AVRO_FIELD_NAME;
 import static tech.allegro.schema.json2avro.converter.AdditionalPropertyField.DEFAULT_JSON_FIELD_NAMES;
-import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.*;
+import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.enumException;
+import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.typeException;
+import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.unionException;
 
 public class JsonGenericRecordReader {
 
@@ -155,8 +152,8 @@ public class JsonGenericRecordReader {
 
         if (allowAdditionalProps && additionalProps.size() > 0) {
             record.set(
-                    avroExtraPropsFieldName,
-                    read(avroExtraPropsField, AdditionalPropertyField.FIELD_SCHEMA, additionalProps, path, false));
+                avroExtraPropsFieldName,
+                read(avroExtraPropsField, AdditionalPropertyField.FIELD_SCHEMA, additionalProps, path, false));
         }
 
         return record.build();
@@ -185,6 +182,7 @@ public class JsonGenericRecordReader {
                 result = readUnion(field, schema, value, path);
                 break;
             case INT:
+// Only "date" logical type is expected here, because the Avro schema is converted from a Json schema, and this logical types corresponds to the Json "date" format.
                 if (logicalType != null && logicalType.equals(LogicalTypes.date())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochDay);
                 } else {
@@ -192,8 +190,9 @@ public class JsonGenericRecordReader {
                 }
                 break;
             case LONG:
-                if (logicalType != null && logicalType.equals(LogicalTypes.timestampMillis())) {
-                    result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochMillis);
+// Only "time-micros" and "timestamp-micros" logical types are expected here, because the Avro schema is converted from a Json schema, and the two logical types corresponds to the Json "time" and "date-time" formats.
+                if (logicalType != null && logicalType.equals(LogicalTypes.timestampMicros())) {
+                    result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochMicros);
                 } else if (logicalType != null && logicalType.equals(LogicalTypes.timeMicros())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getMicroSeconds);
                 } else {
@@ -279,7 +278,8 @@ public class JsonGenericRecordReader {
             throws AvroTypeException {
 
         if (type.isInstance(value)) {
-            return function.apply((T) value);
+            Object result = function.apply((T) value);
+            return result == null ? INCOMPATIBLE : result;
         } else {
             if (silently) {
                 return INCOMPATIBLE;

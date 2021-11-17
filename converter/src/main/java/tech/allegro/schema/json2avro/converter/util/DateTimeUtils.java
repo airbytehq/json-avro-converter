@@ -11,7 +11,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Objects;
 
 public class DateTimeUtils {
 
@@ -23,7 +22,8 @@ public class DateTimeUtils {
     private static final DateTimeFormatter timeFormatter =
             DateTimeFormatter.ofPattern("HH:mm[':'ss[.][SSSSSS][SSSSS][SSSS][SSS]]");
 
-    public static Long getEpochMillis(String dateTime) {
+    // return the number of microseconds from the unix epoch, 1 January 1970 00:00:00.000000 UTC.
+    public static Long getEpochMicros(String dateTime) {
         Instant instant = null;
         if (dateTime.matches("-?\\d+")) {
             return Long.valueOf(dateTime);
@@ -39,9 +39,10 @@ public class DateTimeUtils {
                 LOGGER.error("Failed to parse date-time :" + dateTime);
             }
         }
-        return Objects.requireNonNull(instant).toEpochMilli();
+        return instant == null ? null : instant.toEpochMilli() * 1000;
     }
 
+    // returns the number of days from the unix epoch, 1 January 1970 (ISO calendar).
     public static Integer getEpochDay(String dateTime) {
         Integer epochDay = null;
         try {
@@ -50,28 +51,26 @@ public class DateTimeUtils {
         } catch (DateTimeParseException e) {
             LOGGER.error("Failed to parse date :" + dateTime);
         }
-        return Objects.requireNonNull(epochDay);
+        return epochDay;
     }
 
+    // returns the number of microseconds after midnight, 00:00:00.000000.
     public static Long getMicroSeconds(String dateTime) {
-        Long secondOfDay = null;
+        Long nanoOfDay = null;
         if (dateTime.matches("-?\\d+")) {
             return Long.valueOf(dateTime);
         }
         try {
             LocalTime time = LocalTime.parse(dateTime, timeFormatter);
-            secondOfDay = time.toNanoOfDay();
+            nanoOfDay = time.toNanoOfDay();
         } catch (DateTimeParseException e) {
             try {
-                LocalTime time = LocalTime.parse(dateTime,formatter);
-                secondOfDay = time.toNanoOfDay();
-            }catch (DateTimeParseException ex){
+                LocalTime time = LocalTime.parse(dateTime, formatter);
+                nanoOfDay = time.toNanoOfDay();
+            } catch (DateTimeParseException ex) {
                 LOGGER.error("Failed to parse time :" + dateTime);
             }
         }
-        if (secondOfDay==null){
-            throw new RuntimeException("Failed to parse time :" + dateTime);
-        }
-        return secondOfDay / 1000;
+        return nanoOfDay == null ? null : nanoOfDay / 1000;
     }
 }
