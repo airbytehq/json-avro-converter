@@ -187,7 +187,8 @@ public class JsonGenericRecordReader {
                 result = readUnion(field, schema, value, path);
                 break;
             case INT:
-// Only "date" logical type is expected here, because the Avro schema is converted from a Json schema, and this logical types corresponds to the Json "date" format.
+                // Only "date" logical type is expected here, because the Avro schema is converted from a Json schema,
+                // and this logical types corresponds to the Json "date" format.
                 if (logicalType != null && logicalType.equals(LogicalTypes.date())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochDay);
                 } else {
@@ -195,7 +196,9 @@ public class JsonGenericRecordReader {
                 }
                 break;
             case LONG:
-// Only "time-micros" and "timestamp-micros" logical types are expected here, because the Avro schema is converted from a Json schema, and the two logical types corresponds to the Json "time" and "date-time" formats.
+                // Only "time-micros" and "timestamp-micros" logical types are expected here, because
+                // the Avro schema is converted from a Json schema, and the two logical types corresponds
+                // to the Json "time" and "date-time" formats.
                 if (logicalType != null && logicalType.equals(LogicalTypes.timestampMicros())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochMicros);
                 } else if (logicalType != null && logicalType.equals(LogicalTypes.timeMicros())) {
