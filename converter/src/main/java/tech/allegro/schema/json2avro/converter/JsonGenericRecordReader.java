@@ -222,7 +222,7 @@ public class JsonGenericRecordReader {
             case STRING:
                 // When the schema is string, the value is forced to a string.
                 // This is necessary to handle a Json array field without items specification.
-                // In that case, the schema converter simply assume that it is an array of strings.
+                // In that case, the schema converter simply assumes that it is an array of strings.
                 result = value == null ? INCOMPATIBLE : AdditionalPropertyField.getValue(value);
                 break;
             case BYTES:
