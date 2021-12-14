@@ -662,30 +662,30 @@
     }
   },
   {
-    "testCase": "logical_type_date_unconvertible_value",
+    "testCase": "unknown_array_to_string_array",
+    "description": "Json objects with array fields of unknown types will be converted to string array according to the schema",
     "avroSchema": {
       "type": "record",
       "name": "logical_type_date_unconvertible_value",
       "fields": [
         {
-          "name": "last_convert_date",
+          "name": "array_field",
           "type": [
             "null",
             {
-              "type": "int",
-              "logicalType": "date"
-            },
-            "string"
+              "type": "array",
+              "items": ["null", "string"]
+            }
           ],
           "default": null
         }
       ]
     },
     "jsonObject": {
-      "last_convert_date": "2021-10-10L"
+      "array_field": [101, "102", true, false, { "id": 103, "tag": "104"}, null]
     },
     "avroObject": {
-      "last_convert_date": "2021-10-10L"
+      "array_field": ["101", "102", "true", "false", "{\"id\":103,\"tag\":\"104\"}", null]
     }
   }
 ]
