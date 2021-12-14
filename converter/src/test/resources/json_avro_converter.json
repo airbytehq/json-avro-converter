@@ -666,7 +666,7 @@
     "description": "Json objects with array fields of unknown types will be converted to string array according to the schema",
     "avroSchema": {
       "type": "record",
-      "name": "logical_type_date_unconvertible_value",
+      "name": "unknown_array_to_string_array",
       "fields": [
         {
           "name": "array_field",
