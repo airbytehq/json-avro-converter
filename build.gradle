@@ -15,17 +15,16 @@ scmVersion {
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
+
 
 allprojects {
     project.group = 'tech.allegro.schema.json2avro'
     project.version = scmVersion.version
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
 }
 
 subprojects {
