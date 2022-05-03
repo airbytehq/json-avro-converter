@@ -15,6 +15,12 @@ scmVersion {
     }
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 allprojects {
     project.group = 'tech.allegro.schema.json2avro'
     project.version = scmVersion.version
