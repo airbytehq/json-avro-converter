@@ -1,9 +1,6 @@
 package tech.allegro.schema.json2avro.converter;
 
-import static java.util.stream.Collectors.*;
-
 import java.util.Deque;
-
 import org.apache.avro.AvroTypeException;
 
 class AvroTypeExceptions {
