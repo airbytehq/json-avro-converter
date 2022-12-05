@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static tech.allegro.schema.json2avro.converter.AdditionalPropertyField.DEFAULT_AVRO_FIELD_NAME;
 import static tech.allegro.schema.json2avro.converter.AdditionalPropertyField.DEFAULT_JSON_FIELD_NAMES;
 import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.enumException;
+import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.numberFormatException;
 import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.typeException;
 import static tech.allegro.schema.json2avro.converter.AvroTypeExceptions.unionException;
 
@@ -201,7 +202,9 @@ public class JsonGenericRecordReader {
                 if (logicalType != null && logicalType.equals(LogicalTypes.date())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochDay);
                 } else {
-                    result = onValidNumber(value, path, silently, Number::intValue);
+                    result = value instanceof String ?
+                        onValidType(value, String.class, path, silently, Integer::parseInt) :
+                        onValidNumber(value, path, silently, Number::intValue);
                 }
                 break;
             case LONG:
@@ -213,14 +216,20 @@ public class JsonGenericRecordReader {
                 } else if (logicalType != null && logicalType.equals(LogicalTypes.timeMicros())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getMicroSeconds);
                 } else {
-                    result = onValidNumber(value, path, silently, Number::longValue);
+                    result = value instanceof String ?
+                        onValidType(value, String.class, path, silently, Long::parseLong) :
+                        onValidNumber(value, path, silently, Number::longValue);
                 }
                 break;
             case FLOAT:
-                result = onValidNumber(value, path, silently, Number::floatValue);
+                result = value instanceof String ?
+                    onValidType(value, String.class, path, silently, Float::parseFloat) :
+                    onValidNumber(value, path, silently, Number::floatValue);
                 break;
             case DOUBLE:
-                result = onValidNumber(value, path, silently, Number::doubleValue);
+                result = value instanceof String ?
+                    onValidType(value, String.class, path, silently, Double::parseDouble) :
+                    onValidNumber(value, path, silently, Number::doubleValue);
                 break;
             case BOOLEAN:
                 result = onValidType(value, Boolean.class, path, silently, bool -> bool);
@@ -315,15 +324,26 @@ public class JsonGenericRecordReader {
             throws AvroTypeException {
 
         if (type.isInstance(value)) {
-            Object result = function.apply((T) value);
-            return result == null ? INCOMPATIBLE : result;
-        } else {
-            if (silently) {
-                return INCOMPATIBLE;
-            } else {
-                throw typeException(path, type.getTypeName(), value);
+            try {
+                Object result = function.apply((T) value);
+                return result == null ? INCOMPATIBLE : result;
+            } catch (NumberFormatException nfe) {
+                return processTypeException(value, type, path, silently, nfe);
             }
+        } else {
+            return processTypeException(value, type, path, silently, null);
         }
+    }
+
+    private <T> Object processTypeException(Object value, Class<T> type, Deque<String> path, boolean silently, Exception ex) {
+        if (silently) {
+            return INCOMPATIBLE;
+        } else if (ex instanceof NumberFormatException) {
+            throw numberFormatException(path, value);
+        } else {
+            throw typeException(path, type.getTypeName(), value);
+        }
+
     }
 
     public Object onValidNumber(Object value, Deque<String> path, boolean silently, Function<Number, Object> function) {

@@ -96,7 +96,7 @@ class JsonAvroConverterSpec extends Specification {
         toMap(json) == toMap(converter.convertToJson(avro, schema))
     }
 
-    def "should throw exception when parsing record with mismatched primitives"() {
+    def "should throw exception when parsing not valid string number"() {
         given:
         def schema = '''
             {
@@ -122,7 +122,7 @@ class JsonAvroConverterSpec extends Specification {
 
         then:
         def e = thrown AvroConversionException
-        e.message == "Failed to convert JSON to Avro: Field field_integer is expected to be type: java.lang.Number, but it is: foobar"
+        e.message == "Failed to convert JSON to Avro: Field field_integer is expected to be Number format, but it is: foobar"
     }
 
     def "should ignore unknown fields"() {

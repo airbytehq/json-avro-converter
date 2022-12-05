@@ -38,4 +38,14 @@ class AvroTypeExceptions {
             .append(offendingValue)
             .toString());
     }
+
+    static AvroTypeException numberFormatException(Deque<String> fieldPath, Object offendingValue) {
+        return new AvroTypeException(new StringBuilder()
+            .append("Field ")
+            .append(PathsPrinter.print(fieldPath))
+            .append(" is expected to be Number format")
+            .append(", but it is: ")
+            .append(offendingValue)
+            .toString());
+    }
 }
