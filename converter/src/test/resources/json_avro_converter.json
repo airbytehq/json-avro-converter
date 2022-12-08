@@ -88,6 +88,18 @@
           "type": "int"
         },
         {
+          "name": "int_infinity",
+          "type": "int"
+        },
+        {
+          "name": "int_infinity_negative",
+          "type": "int"
+        },
+        {
+          "name": "int_nan",
+          "type": "int"
+        },
+        {
           "name": "long_string_field",
           "type": "long"
         },
@@ -102,25 +114,48 @@
         {
           "name": "double_field",
           "type": "double"
+        },
+        {
+          "name": "double_infinity",
+          "type": "double"
+        },
+        {
+          "name": "double_infinity_negative",
+          "type": "double"
+        },
+        {
+          "name": "double_nan",
+          "type": "double"
         }
       ]
     },
     "jsonObject": {
       "int_string_field": "100",
       "int_field": 100,
+      "int_infinity": "Infinity",
+      "int_infinity_negative": "-Infinity",
+      "int_nan": "NaN",
       "long_string_field": "1000000000",
       "long_field": 1000000000,
       "double_string_field": "100.2",
-      "double_field": 100.2
-
+      "double_field": 100.2,
+      "double_infinity": "Infinity",
+      "double_infinity_negative": "-Infinity",
+      "double_nan": "NaN"
     },
     "avroObject": {
       "int_string_field" : 100,
       "int_field": 100,
+      "int_infinity": "Infinity",
+      "int_infinity_negative": "-Infinity",
+      "int_nan": "NaN",
       "long_string_field": 1000000000,
       "long_field": 1000000000,
       "double_string_field": 100.2,
-      "double_field": 100.2
+      "double_field": 100.2,
+      "double_infinity": "Infinity",
+      "double_infinity_negative": "-Infinity",
+      "double_nan": "NaN"
     }
   },
   {

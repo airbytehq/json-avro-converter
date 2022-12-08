@@ -32,6 +32,7 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecordBuilder;
 import tech.allegro.schema.json2avro.converter.util.DateTimeUtils;
+import tech.allegro.schema.json2avro.converter.util.NumberUtil;
 
 public class JsonGenericRecordReader {
 
@@ -202,8 +203,8 @@ public class JsonGenericRecordReader {
                 if (logicalType != null && logicalType.equals(LogicalTypes.date())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochDay);
                 } else {
-                    result = value instanceof String ?
-                        onValidType(value, String.class, path, silently, Integer::parseInt) :
+                    result = value instanceof String valueString?
+                        onValidStringInteger(valueString, path, silently) :
                         onValidNumber(value, path, silently, Number::intValue);
                 }
                 break;
@@ -344,6 +345,16 @@ public class JsonGenericRecordReader {
             throw typeException(path, type.getTypeName(), value);
         }
 
+    }
+
+    public <T> Object onValidStringInteger(String value, Deque<String> path, boolean silently)
+        throws AvroTypeException {
+        if (NumberUtil.isInfinityOrNan(value)) {
+            // Double::parseDouble are able to handle Infinity and NaN values
+            return onValidType(value, String.class, path, silently, Double::parseDouble);
+        } else {
+            return onValidType(value, String.class, path, silently, Integer::parseInt);
+        }
     }
 
     public Object onValidNumber(Object value, Deque<String> path, boolean silently, Function<Number, Object> function) {
