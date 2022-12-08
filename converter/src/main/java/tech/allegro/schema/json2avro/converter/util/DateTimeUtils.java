@@ -12,10 +12,7 @@ import java.time.format.DateTimeParseException;
 public class DateTimeUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("[yyyy][yy]['-']['/']['.'][' '][MMM][MM][M]['-']['/']['.'][' '][dd][d]"
-                + "[[' ']['T']HH:mm[':'ss[.][SSSSSS][SSSSS][SSSS][SSS][' '][z][zzz][Z][O][x][XXX][XX][X][' '][G]]]");
-    private static final DateTimeFormatter DATE_FORMATTER =
-        DateTimeFormatter.ofPattern("[yyyy][yy]['-']['/']['.'][' '][MMM][MM][M]['-']['/']['.'][' '][dd][d][[' '][G]]");
+            DateTimeFormatter.ofPattern("[yyyy][yy]['-']['/']['.'][' '][MMM][MM][M]['-']['/']['.'][' '][dd][d][[' '][G]][[' ']['T']HH:mm[':'ss[.][SSSSSS][SSSSS][SSSS][SSS][' '][z][zzz][Z][O][x][XXX][XX][X][[' '][G]]]]");
     private static final DateTimeFormatter TIME_FORMATTER =
             DateTimeFormatter.ofPattern("HH:mm[':'ss[.][SSSSSS][SSSSS][SSSS][SSS][' '][z][zzz][Z][O][x][XXX][XX][X]]");
 
@@ -51,7 +48,7 @@ public class DateTimeUtils {
         jsonDate = cleanLineBreaks(jsonDate);
         Integer epochDay = null;
         try {
-            LocalDate date = LocalDate.parse(jsonDate, DATE_FORMATTER);
+            LocalDate date = LocalDate.parse(jsonDate, DATE_TIME_FORMATTER);
             epochDay = (int) date.toEpochDay();
         } catch (DateTimeParseException e) {
             // no logging since it may generate too much noise
