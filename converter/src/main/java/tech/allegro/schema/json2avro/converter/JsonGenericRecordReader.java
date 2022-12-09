@@ -203,7 +203,7 @@ public class JsonGenericRecordReader {
                 if (logicalType != null && logicalType.equals(LogicalTypes.date())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochDay);
                 } else {
-                    result = value instanceof String valueString?
+                    result = value instanceof String valueString? // implicit cast to String
                         onValidStringInteger(valueString, path, silently) :
                         onValidNumber(value, path, silently, Number::intValue);
                 }
@@ -217,19 +217,19 @@ public class JsonGenericRecordReader {
                 } else if (logicalType != null && logicalType.equals(LogicalTypes.timeMicros())) {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getMicroSeconds);
                 } else {
-                    result = value instanceof String ?
-                        onValidType(value, String.class, path, silently, Long::parseLong) :
+                    result = value instanceof String stringValue ? // implicit cast to String
+                        onValidStringNumber(stringValue, path, silently, Long::parseLong) :
                         onValidNumber(value, path, silently, Number::longValue);
                 }
                 break;
             case FLOAT:
-                result = value instanceof String ?
-                    onValidType(value, String.class, path, silently, Float::parseFloat) :
+                result = value instanceof String stringValue ? // implicit cast to String
+                    onValidStringNumber(stringValue, path, silently, Float::parseFloat) :
                     onValidNumber(value, path, silently, Number::floatValue);
                 break;
             case DOUBLE:
-                result = value instanceof String ?
-                    onValidType(value, String.class, path, silently, Double::parseDouble) :
+                result = value instanceof String stringValue ? // implicit cast to String
+                    onValidStringNumber(stringValue, path, silently, Double::parseDouble) :
                     onValidNumber(value, path, silently, Number::doubleValue);
                 break;
             case BOOLEAN:
@@ -320,44 +320,60 @@ public class JsonGenericRecordReader {
         return ByteBuffer.wrap(string.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * converted value based on passed function
+     *
+     * @throws AvroTypeException if type class != value class
+     */
     @SuppressWarnings("unchecked")
     public <T> Object onValidType(Object value, Class<T> type, Deque<String> path, boolean silently, Function<T, Object> function)
             throws AvroTypeException {
 
         if (type.isInstance(value)) {
-            try {
-                Object result = function.apply((T) value);
-                return result == null ? INCOMPATIBLE : result;
-            } catch (NumberFormatException nfe) {
-                return processTypeException(value, type, path, silently, nfe);
-            }
+            Object result = function.apply((T) value);
+            return result == null ? INCOMPATIBLE : result;
         } else {
-            return processTypeException(value, type, path, silently, null);
+            return processException(silently, typeException(path, type.getTypeName(), value));
         }
     }
 
-    private <T> Object processTypeException(Object value, Class<T> type, Deque<String> path, boolean silently, Exception ex) {
-        if (silently) {
-            return INCOMPATIBLE;
-        } else if (ex instanceof NumberFormatException) {
-            throw numberFormatException(path, value);
-        } else {
-            throw typeException(path, type.getTypeName(), value);
+    /**
+     * tries to convert string value numbers
+     *
+     * @throws AvroTypeException if value is not numeric
+     */
+    public Object onValidStringNumber(String value, Deque<String> path, boolean silently, Function<String, Object> function)
+        throws AvroTypeException {
+        try {
+            return onValidType(value, String.class, path, silently, function);
+        } catch (NumberFormatException nfe) {
+            return processException(silently, numberFormatException(path, value));
         }
-
     }
 
-    public <T> Object onValidStringInteger(String value, Deque<String> path, boolean silently)
+    /**
+     * Add {@code Infinity -Infinity NaN} support for Integer
+     *
+     * @throws AvroTypeException if value is not numeric
+     */
+    public Object onValidStringInteger(String value, Deque<String> path, boolean silently)
         throws AvroTypeException {
         if (NumberUtil.isInfinityOrNan(value)) {
             // Double::parseDouble are able to handle Infinity and NaN values
-            return onValidType(value, String.class, path, silently, Double::parseDouble);
+            return onValidStringNumber(value, path, silently, Double::parseDouble);
         } else {
-            return onValidType(value, String.class, path, silently, Integer::parseInt);
+            return onValidStringNumber(value, path, silently, Integer::parseInt);
         }
     }
 
     public Object onValidNumber(Object value, Deque<String> path, boolean silently, Function<Number, Object> function) {
         return onValidType(value, Number.class, path, silently, function);
     }
+
+    private Object processException(boolean silently, AvroTypeException ex) throws AvroTypeException {
+        if (silently) {
+            return INCOMPATIBLE;
+        } else  {throw ex;}
+    }
+
 }
