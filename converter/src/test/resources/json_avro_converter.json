@@ -88,18 +88,6 @@
           "type": "int"
         },
         {
-          "name": "int_infinity",
-          "type": "int"
-        },
-        {
-          "name": "int_infinity_negative",
-          "type": "int"
-        },
-        {
-          "name": "int_nan",
-          "type": "int"
-        },
-        {
           "name": "long_string_field",
           "type": "long"
         },
@@ -132,9 +120,6 @@
     "jsonObject": {
       "int_string_field": "100",
       "int_field": 100,
-      "int_infinity": "Infinity",
-      "int_infinity_negative": "-Infinity",
-      "int_nan": "NaN",
       "long_string_field": "1000000000",
       "long_field": 1000000000,
       "double_string_field": "100.2",
@@ -146,9 +131,6 @@
     "avroObject": {
       "int_string_field" : 100,
       "int_field": 100,
-      "int_infinity": "Infinity",
-      "int_infinity_negative": "-Infinity",
-      "int_nan": "NaN",
       "long_string_field": 1000000000,
       "long_field": 1000000000,
       "double_string_field": 100.2,

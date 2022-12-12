@@ -38,6 +38,18 @@ class JsonAvroConverterSpec extends Specification {
                     "type" : "double"
                   },
                   {
+                    "name" : "field_double_infinity",
+                    "type" : "double"
+                  },
+                  {
+                    "name" : "field_double_infinity_negative",
+                    "type" : "double"
+                  },
+                  {
+                    "name" : "field_double_nan",
+                    "type" : "double"
+                  },                                      
+                  {
                     "name" : "field_boolean",
                     "type" : "boolean"
                   },
@@ -55,6 +67,9 @@ class JsonAvroConverterSpec extends Specification {
             "field_long": 2,
             "field_float": 1.1,
             "field_double": 1.2,
+            "field_double_infinity": "Infinity",
+            "field_double_infinity_negative": "-Infinity",
+            "field_double_nan": "NaN",
             "field_boolean": true,
             "field_string": "foobar"
         }
@@ -96,7 +111,41 @@ class JsonAvroConverterSpec extends Specification {
         toMap(json) == toMap(converter.convertToJson(avro, schema))
     }
 
-    def "should throw exception when parsing not valid string number"() {
+    def 'should decode base64 string and convert bytes generic record'() {
+        given:
+        def schema = '''
+            {
+              "type" : "record",
+              "name" : "testSchema",
+              "fields" : [
+                  {
+                    "name" : "field_bytes",
+                    "type" : "bytes"
+                  }
+              ]
+            }
+        '''
+
+        def jsonInput = '''
+        {
+            "field_bytes": "YmFzZTY0dGVzdA=="
+        }
+        '''
+
+        def jsonExpected = '''
+        {
+            "field_bytes": "base64test"
+        }
+        '''
+
+        when:
+        byte[] avro = converter.convertToAvro(jsonInput.bytes, schema)
+
+        then:
+        toMap(jsonExpected) == toMap(converter.convertToJson(avro, schema))
+    }
+
+    def "should throw exception when parsing invalid string number"() {
         given:
         def schema = '''
             {

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecordBuilder;
 import tech.allegro.schema.json2avro.converter.util.DateTimeUtils;
-import tech.allegro.schema.json2avro.converter.util.NumberUtil;
+import tech.allegro.schema.json2avro.converter.util.StringUtil;
 
 public class JsonGenericRecordReader {
 
@@ -204,7 +205,7 @@ public class JsonGenericRecordReader {
                     result = onValidType(value, String.class, path, silently, DateTimeUtils::getEpochDay);
                 } else {
                     result = value instanceof String valueString? // implicit cast to String
-                        onValidStringInteger(valueString, path, silently) :
+                        onValidStringNumber(valueString, path, silently, Integer::parseInt) :
                         onValidNumber(value, path, silently, Number::intValue);
                 }
                 break;
@@ -246,7 +247,7 @@ public class JsonGenericRecordReader {
                 }
                 break;
             case BYTES:
-                result = onValidType(value, String.class, path, silently, string -> bytesForString(string));
+                result = onValidType(value, String.class, path, silently, this::bytesForString);
                 break;
             case NULL:
                 result = value == null ? value : INCOMPATIBLE;
@@ -317,6 +318,9 @@ public class JsonGenericRecordReader {
     }
 
     private ByteBuffer bytesForString(String string) {
+        if (StringUtil.isBase64(string)) {
+            return ByteBuffer.wrap(StringUtil.decodeBase64(string).getBytes(StandardCharsets.UTF_8));
+        }
         return ByteBuffer.wrap(string.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -348,21 +352,6 @@ public class JsonGenericRecordReader {
             return onValidType(value, String.class, path, silently, function);
         } catch (NumberFormatException nfe) {
             return processException(silently, numberFormatException(path, value));
-        }
-    }
-
-    /**
-     * Add {@code Infinity -Infinity NaN} support for Integer
-     *
-     * @throws AvroTypeException if value is not numeric
-     */
-    public Object onValidStringInteger(String value, Deque<String> path, boolean silently)
-        throws AvroTypeException {
-        if (NumberUtil.isInfinityOrNan(value)) {
-            // Double::parseDouble are able to handle Infinity and NaN values
-            return onValidStringNumber(value, path, silently, Double::parseDouble);
-        } else {
-            return onValidStringNumber(value, path, silently, Integer::parseInt);
         }
     }
 

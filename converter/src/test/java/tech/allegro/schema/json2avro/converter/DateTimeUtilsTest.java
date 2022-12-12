@@ -51,8 +51,10 @@ public class DateTimeUtilsTest {
         assertEquals(3660000000L, getMicroSeconds("01:01"));
         assertEquals(44581541000L, getMicroSeconds("12:23:01.541"));
         assertEquals(44581541214L, getMicroSeconds("12:23:01.541214"));
+    }
 
-        // clean line breaks
+    @Test
+    public void cleaNLineBreaksTest() {
         assertEquals(1585612800000000L, getEpochMicros("2020-03-\n31T00:00:00Z\r"));
         assertEquals(18628, getEpochDay("2021-\n1-1\r"));
     }
