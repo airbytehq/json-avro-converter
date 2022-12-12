@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
