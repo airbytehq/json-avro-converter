@@ -174,6 +174,64 @@ class JsonAvroConverterSpec extends Specification {
         e.message == "Failed to convert JSON to Avro: Field field_integer is expected to be Number format, but it is: foobar"
     }
 
+    def "should throw exception when parsing infinity int"() {
+        given:
+        def schema = '''
+            {
+              "type" : "record",
+              "name" : "testSchema",
+              "fields" : [
+                  {
+                    "name" : "field_integer_infinity",
+                    "type" : "int"
+                  }
+              ]
+            }
+        '''
+
+        def json = '''
+        {
+            "field_integer_infinity": "Infinity"
+        }
+        '''
+
+        when:
+        converter.convertToAvro(json.bytes, schema)
+
+        then:
+        def e = thrown AvroConversionException
+        e.message == "Failed to convert JSON to Avro: Field field_integer_infinity is expected to be Number format, but it is: Infinity"
+    }
+
+    def "should throw exception when parsing nan int"() {
+        given:
+        def schema = '''
+            {
+              "type" : "record",
+              "name" : "testSchema",
+              "fields" : [
+                  {
+                    "name" : "field_integer_nan",
+                    "type" : "int"
+                  }
+              ]
+            }
+        '''
+
+        def json = '''
+        {
+            "field_integer_nan": "NaN"
+        }
+        '''
+
+        when:
+        converter.convertToAvro(json.bytes, schema)
+
+        then:
+        def e = thrown AvroConversionException
+        e.message == "Failed to convert JSON to Avro: Field field_integer_nan is expected to be Number format, but it is: NaN"
+    }
+
     def "should ignore unknown fields"() {
         given:
         def schema = '''
