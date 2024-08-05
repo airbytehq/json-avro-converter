@@ -1,11 +1,6 @@
 package tech.allegro.schema.json2avro.converter.util;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -67,14 +62,28 @@ public class DateTimeUtils {
             return Long.valueOf(jsonTime);
         }
         try {
-            LocalTime time = LocalTime.parse(jsonTime, TIME_FORMATTER);
-            nanoOfDay = time.toNanoOfDay();
-        } catch (DateTimeParseException e) {
+            // This will only succeed if the time has a timezone.
+            OffsetTime time = OffsetTime.parse(jsonTime, TIME_FORMATTER);
+            nanoOfDay = time.toLocalTime().toNanoOfDay();
+
+            // Apply the offset, wrapping around midnight.
+            nanoOfDay -= time.getOffset().getTotalSeconds() * 1_000_000_000L;
+            if (nanoOfDay < 0) {
+                nanoOfDay += 24 * 60 * 60 * 1_000_000_000L;
+            }
+        } catch (DateTimeException e) {
             try {
-                LocalTime time = LocalTime.parse(jsonTime, DATE_TIME_FORMATTER);
+                // Works on any correctly formatted time without a timezone
+                LocalTime time = LocalTime.parse(jsonTime, TIME_FORMATTER);
                 nanoOfDay = time.toNanoOfDay();
             } catch (DateTimeParseException ex) {
-                // no logging since it may generate too much noise
+                try {
+                    // Catchall
+                    LocalTime time = LocalTime.parse(jsonTime, DATE_TIME_FORMATTER);
+                    nanoOfDay = time.toNanoOfDay();
+                } catch (DateTimeParseException exc) {
+                    // no logging since it may generate too much noise
+                }
             }
         }
         return nanoOfDay == null ? null : nanoOfDay / 1000;

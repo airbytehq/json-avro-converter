@@ -51,6 +51,8 @@ public class DateTimeUtilsTest {
         assertEquals(3660000000L, getMicroSeconds("01:01"));
         assertEquals(44581541000L, getMicroSeconds("12:23:01.541"));
         assertEquals(44581541214L, getMicroSeconds("12:23:01.541214"));
+        assertEquals(39600000000L, getMicroSeconds("12:00:00.000000+01:00"));
+        assertEquals(84600000000L, getMicroSeconds("03:30:00.000000+04:00"));
     }
 
     @Test

@@ -59,6 +59,17 @@
                 "int"
               ],
               "default": null
+            },
+            {
+              "name": "TIME_WITH_TIMEZONE",
+              "type": [
+                "null",
+                {
+                  "type": "long",
+                  "logicalType": "time-micros"
+                }
+              ],
+              "default": null
             }
           ]
         }
@@ -81,7 +92,8 @@
           },
           "data": {
             "name": "Bob",
-            "id": 1
+            "id": 1,
+            "time_with_timezone": "04:00:00+05:30"
           }
         },
         {
@@ -90,7 +102,8 @@
           },
           "data": {
             "name": "Alice",
-            "id": 2
+            "id": 2,
+            "time_with_timezone": "12:00:00"
           }
         }
       ],
@@ -107,7 +120,8 @@
           },
           "DATA": {
             "NAME": "Bob",
-            "ID": 1
+            "ID": 1,
+            "TIME_WITH_TIMEZONE": 81000000000
           }
         },
         {
@@ -116,7 +130,8 @@
           },
           "DATA": {
             "NAME": "Alice",
-            "ID": 2
+            "ID": 2,
+            "TIME_WITH_TIMEZONE": 43200000000
           }
         }
       ]
@@ -134,7 +149,8 @@
               "o",
               "b"
             ],
-            "id": 1
+            "id": 1,
+            "time_with_timezone": "04:00:00.000+05:30"
           }
         },
         {
@@ -143,7 +159,8 @@
           },
           "data": {
             "name": "Alice",
-            "id": 2
+            "id": 2,
+            "time_with_timezone": "12:00:00.000"
           }
         }
       ],
@@ -160,7 +177,8 @@
               },
               "DATA": {
                   "NAME": null,
-                  "ID": 1
+                  "ID": 1,
+                  "TIME_WITH_TIMEZONE": 81000000000
               }
           },
           {
@@ -169,7 +187,8 @@
               },
               "DATA": {
                   "NAME": "Alice",
-                  "ID": 2
+                  "ID": 2,
+                  "TIME_WITH_TIMEZONE": 43200000000
               }
           }
         ]
@@ -189,7 +208,8 @@
             },
             "data": {
               "name": 808,
-              "id": 2
+              "id": 2,
+              "time_with_timezone": "04:00:00+05:30"
             }
           },
           {
@@ -198,7 +218,8 @@
             },
             "data": {
               "name": "Alice",
-              "id": 2
+              "id": 2,
+              "time_with_timezone": "12:00:00Z"
             }
           }
         ],
@@ -220,7 +241,8 @@
                 },
                 "DATA": {
                     "NAME": null,
-                    "ID": 2
+                    "ID": 2,
+                    "TIME_WITH_TIMEZONE": 81000000000
                 }
             },
             {
@@ -229,10 +251,64 @@
                 },
                 "DATA": {
                     "NAME": "Alice",
-                    "ID": 2
+                    "ID": 2,
+                    "TIME_WITH_TIMEZONE": 43200000000
                 }
             }
         ]
+    },
+    {
+      "name": "record with malformed timezone",
+      "records": [
+        {
+          "meta": {
+            "changes": []
+          },
+          "data": {
+            "name": "Bob",
+            "id": 1,
+            "time_with_timezone": "04:00:00+05:30"
+          }
+        },
+        {
+          "meta": {
+            "changes": []
+          },
+          "data": {
+            "name": "Alice",
+            "id": 2,
+            "time_with_timezone": "12:00:00-3:00"
+          }
+        }
+      ],
+      "expectedOutput": [
+        {
+          "META": {
+            "CHANGES": []
+          },
+          "DATA": {
+            "NAME": "Bob",
+            "ID": 1,
+            "TIME_WITH_TIMEZONE": 81000000000
+          }
+        },
+        {
+          "META": {
+            "CHANGES": [
+              {
+                "FIELD": "time_with_timezone",
+                "CHANGE": "NULLED",
+                "REASON": "Could not evaluate union, field TIME_WITH_TIMEZONE is expected to be one of these: NULL, LONG. If this is a complex type, check if offending field (path: DATA.TIME_WITH_TIMEZONE) adheres to schema: 12:00:00-3:00"
+              }
+            ]
+          },
+          "DATA": {
+            "NAME": "Alice",
+            "ID": 2,
+            "TIME_WITH_TIMEZONE": null
+          }
+        }
+      ]
     }
   ]
 }
