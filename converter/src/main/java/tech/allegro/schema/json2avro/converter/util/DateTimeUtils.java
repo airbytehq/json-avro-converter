@@ -66,7 +66,10 @@ public class DateTimeUtils {
             OffsetTime time = OffsetTime.parse(jsonTime, TIME_FORMATTER);
             nanoOfDay = time.toLocalTime().toNanoOfDay();
 
-            // Apply the offset, wrapping around midnight.
+            // Apply the offset. The results of this operation might be negative.
+            // For example, if the time is 02:00:00+03:00, the time at UTC
+            // is 23:00 the previous day (ie, -01:00). Negative results are added
+            // to 24 hours to get the correct result. (-01:00 + 24:00 = 23:00.)
             nanoOfDay -= time.getOffset().getTotalSeconds() * 1_000_000_000L;
             if (nanoOfDay < 0) {
                 nanoOfDay += 24 * 60 * 60 * 1_000_000_000L;
